@@ -1,6 +1,6 @@
 `define DINO_X 50
-`define DINO_HEIGHT 26
-`define DINO_WIDTH 25
+`define DINO_HEIGHT 28
+`define DINO_WIDTH 24
 module GenPicDino(
     input wire clk,
     input wire rst,
@@ -23,7 +23,7 @@ module GenPicDino(
 
     assign {vgaRed, vgaGreen, vgaBlue} = valid ? pixel : 12'hFFF;  
     //assign {vgaRed, vgaGreen, vgaBlue} = pixel;
-    assign valid = (h_start <= h_addr && h_addr < `DINO_X) && (v_start <= v_addr && v_addr < pos);
+    assign valid = (h_start < h_addr && h_addr < `DINO_X) && (v_start < v_addr && v_addr < pos);
     assign h_addr = h_cnt>>1;
     assign v_addr = v_cnt>>1;
     assign h_start = `DINO_X - `DINO_WIDTH;

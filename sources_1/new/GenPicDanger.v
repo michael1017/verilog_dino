@@ -22,7 +22,7 @@ module GenPicDanger(
 
 
     assign {vgaRed, vgaGreen, vgaBlue} = valid ? pixel : 12'hFFF;  
-    assign valid = (h_start <= h_addr && h_addr < pos) && (v_start <= v_addr && v_addr < `GROUND);
+    assign valid = (h_start < h_addr && h_addr < pos) && (v_start < v_addr && v_addr < `GROUND);
     assign h_addr = h_cnt>>1;
     assign v_addr = v_cnt>>1;
     assign h_start = pos > `DANGER1_WIDTH ? pos - `DANGER1_WIDTH : 0;

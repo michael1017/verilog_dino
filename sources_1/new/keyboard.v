@@ -135,9 +135,9 @@ module KeyboardValue(
 	
 	parameter [8:0] KEY_CODES [0:3] = {
 		9'b0_0101_1010,	// 5A enter
-		9'b0_0010_1001,	// 1 => 16 space
-		9'b1_0111_0101,	// 2 => 1E up
-		9'b1_0111_0010	// 3 => 26 down
+		9'b0_0010_1001,	// 29 space
+		9'b0_0111_0101,	// 75 up
+		9'b0_0111_0010	// 72 down
 	};
 	
 	reg [15:0] nums;

@@ -17,8 +17,25 @@ module main(
     GameClock gc(clk, rst, game_clk);
 
     wire [8:0] dino_pos, danger_pos1, danger_pos2, danger_pos3;
+    wire [2:0] danger_type1, danger_type2, danger_type3;
+    wire danger_en1, danger_en2, danger_en3;
     wire [1:0] danger_num;
-    ObjCtrl obj(clk, rst, game_clk, dino_pos, danger_pos1, danger_pos2, danger_pos3, danger_num, PS2_DATA, PS2_CLK);
+    ObjCtrl obj(
+        clk, 
+        rst, 
+        game_clk, 
+        dino_pos, 
+        danger_pos1, 
+        danger_pos2, 
+        danger_pos3, 
+        danger_type1,
+        danger_type2,
+        danger_type3,
+        danger_en1,
+        danger_en2,
+        danger_en3,
+        PS2_DATA, 
+        PS2_CLK);
 
     wire [9:0] h_cnt, v_cnt;
     wire valid;

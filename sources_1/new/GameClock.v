@@ -11,7 +11,7 @@ module GameClock(
     always @ (posedge clk, posedge rst) begin
         if (rst == 1'b1) begin
             counter <= 0;
-            divider <= 700000;
+            divider <= 200000;
             full <= 0;
             clk_div <= 1;
         end else begin
@@ -20,8 +20,8 @@ module GameClock(
             end else begin
                 if (full == 9999) begin
                     full <= 0;
-                    if (divider != 350000) begin
-                        divider <= divider - 50000;
+                    if (divider != 100000) begin
+                        divider <= divider - 20000;
                     end else begin
                         divider <= divider;
                     end
