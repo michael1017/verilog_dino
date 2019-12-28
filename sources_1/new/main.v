@@ -35,7 +35,8 @@ module main(
         danger_en2,
         danger_en3,
         PS2_DATA, 
-        PS2_CLK);
+        PS2_CLK
+    );
 
     wire [9:0] h_cnt, v_cnt;
     wire valid;
@@ -48,7 +49,24 @@ module main(
     GenPicDino GPDino(clk, rst, dino_pos, h_cnt, v_cnt, dino_vgaRed, dino_vgaGreen, dino_vgaBlue);
 
     wire [3:0] danger_vgaRed, danger_vgaGreen, danger_vgaBlue;
-    GenPicDanger GPDanger(clk, rst, danger_pos1, h_cnt, v_cnt, danger_vgaRed, danger_vgaGreen, danger_vgaBlue);
+    GenPicDanger GPDanger(
+        clk, 
+        rst, 
+        danger_pos1, 
+        danger_pos2, 
+        danger_pos3, 
+        danger_type1, 
+        danger_type2, 
+        danger_type3, 
+        danger_en1, 
+        danger_en2, 
+        danger_en3,
+        h_cnt,
+        v_cnt,
+        danger_vgaRed,
+        danger_vgaGreen,   
+        danger_vgaBlue
+    );
 
     //assign {vgaRed, vgaGreen, vgaBlue} = (valid == 1'b1) ? {dino_vgaRed, dino_vgaGreen, dino_vgaBlue} : 12'h0;
     //assign {vgaRed, vgaGreen, vgaBlue} = (valid == 1'b1) ? {background_vgaRed, background_vgaGreen, background_vgaBlue} : 12'h0;

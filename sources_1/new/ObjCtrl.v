@@ -1,4 +1,3 @@
-`define DINO_X  50
 `define ENTER 0
 `define SPACE 1
 `define UP    2
@@ -68,9 +67,9 @@ module ObjCtrl(
     always @ (posedge game_clk or posedge rst) begin
         if (rst == 1) begin
             ensure_empty_counter = 0;
-            danger_pos1 = 319;
-            danger_pos2 = 319;
-            danger_pos2 = 319;
+            danger_pos1 = 0;
+            danger_pos2 = 0;
+            danger_pos2 = 0;
             danger_type1 = `NOTHING;
             danger_type2 = `NOTHING;
             danger_type3 = `NOTHING;
@@ -81,7 +80,7 @@ module ObjCtrl(
         end else begin
             if ((danger_en1 & danger_en2 & danger_en3) == 1) begin
                 ensure_empty_counter = 0;
-            end else if (ensure_empty_counter != 50) begin
+            end else if (ensure_empty_counter != 63) begin
                 ensure_empty_counter = ensure_empty_counter + 1;
             end else begin
                 //initialize
@@ -119,26 +118,25 @@ module ObjCtrl(
                     next_danger_type = `HIGH_BIRD;danger_pos1 = 319;
                 end
             end
-            //recycle
+            //recycle and move
             if (danger_pos1 == 0) begin
                 danger_en1 = 0;
                 danger_type1 = `NOTHING;
-                danger_pos1 = 319;
-            end else if (danger_pos2 == 0) begin
+            end else begin
+                danger_pos1 = danger_pos1 - 1;
+            end
+            if (danger_pos2 == 0) begin
                 danger_en2 = 0;
                 danger_type2 = `NOTHING;
-                danger_pos2 = 319;
-            end else if (danger_pos3 == 0) begin
+            end else begin
+                danger_pos2 = danger_pos2 - 1;
+            end
+            if (danger_pos3 == 0) begin
                 danger_en3 = 0;
                 danger_type3 = `NOTHING;
-                danger_pos3 = 319;
             end else begin
-                // do nothing
-            end 
-            //move
-            danger_pos1 = danger_pos1 - 1;
-            danger_pos2 = danger_pos2 - 1;
-            danger_pos3 = danger_pos3 - 1;
+                danger_pos3 = danger_pos3 - 1;
+            end
 
         end
     end

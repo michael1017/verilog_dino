@@ -1,3 +1,5 @@
+`define BACKGROUND_WIDTH 1187
+`define BACKGROUND_HEIGHT 14
 module GenPicBackground(
     input wire clk,
     input wire rst,
@@ -14,30 +16,28 @@ module GenPicBackground(
     wire [16:0] pixel_addr;
     wire [11:0] pixel;
     wire [11:0] pixel_next;
-    reg [8:0] xpos, ypos;
+    reg [10:0] xpos, ypos;
     wire valid;
 
-    assign {vgaRed, vgaGreen, vgaBlue} = pixel_next;  
-    //assign valid = 0 <= v_cnt>>1 && v_cnt>>1 <= ypos ;
-    //assign pixel = valid ? pixel : pixel_next;
-
+    assign {vgaRed, vgaGreen, vgaBlue} = valid ? pixel_next : 12'hFFF;  
+    assign valid = 143 < v_cnt && v_cnt < 157 ? 1 : 0;
     ClockDivider #(2) clk2(clk, clk_div2);
     ClockDivider #(22) clk22(clk, clk_div22);
     
     always @ (posedge game_clk or posedge rst) begin
         if (rst == 1) begin
-            xpos = 320;
-            ypos = 240;
+            xpos = 1187;
+            ypos = 157;
         end else begin
             if (xpos == 0) begin
-                xpos = 320;
+                xpos = 1187;
             end else begin
                 xpos = xpos - 1;
             end
         end
     end
     
-    mem_addr_gen mem_background(
+    mem_addr_gen #(`BACKGROUND_WIDTH, `BACKGROUND_HEIGHT) mem_background(
         .clk(clk_div2),
         .rst(rst),
         .pos_x(xpos),
