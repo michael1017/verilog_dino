@@ -1,6 +1,6 @@
-`define GROUND 147
-`define HIGH_SKY 100
-`define LOW_SKY 140
+`define GROUND 298
+`define HIGH_SKY 250
+`define LOW_SKY 290
 `define BIG_CACTUS_HEIGHT 50
 `define BIG_CACTUS_WIDTH 27
 `define SMALL_CACTUS_HEIGHT 36
@@ -19,9 +19,9 @@
 module GenPicDanger(
     input wire clk,
     input wire rst,
-    input wire [8:0] danger_pos1, 
-    input wire [8:0] danger_pos2, 
-    input wire [8:0] danger_pos3, 
+    input wire [9:0] new_danger_pos1, 
+    input wire [9:0] new_danger_pos2, 
+    input wire [9:0] new_danger_pos3, 
     input wire [2:0] danger_type1,
     input wire [2:0] danger_type2,
     input wire [2:0] danger_type3,
@@ -41,30 +41,40 @@ module GenPicDanger(
     reg [16:0] pixel_addr_cb, pixel_addr_cs, pixel_addr_cm, pixel_addr_bd;
     reg [6:0] danger_width1, danger_width2, danger_width3;
     reg [6:0] danger_height1, danger_height2, danger_height3;
-    reg [8:0] danger_y1, danger_y2, danger_y3; // y_position
+    reg [9:0] danger_y1, danger_y2, danger_y3; // y_position
     reg [11:0] pixel1, pixel2, pixel3;
     wire [11:0] pixel_cb, pixel_cs, pixel_cm, pixel_bd;
     wire valid1, valid2, valid3;
-    wire [8:0] h_addr, v_addr;
+    reg [9:0] danger_pos1, danger_pos2, danger_pos3;
+    wire on_edge1, on_edge2, on_edge3;
     //wire [8:0] h_start1, h_start2, h_start3, v_start1, v_start2, v_start3;
 
 
     assign {vgaRed, vgaGreen, vgaBlue} = pixel1 & pixel2 & pixel3;  
-    assign h_addr = h_cnt;
-    assign v_addr = v_cnt;
     //assign h_start1 = (danger_pos1 > danger_width1 ? danger_pos1 - danger_width1 : 0);
     //assign h_start2 = (danger_pos2 > danger_width2 ? danger_pos2 - danger_width2 : 0);
     //assign h_start3 = (danger_pos3 > danger_width3 ? danger_pos3 - danger_width3 : 0);
     //assign v_start1 = (danger_y1 - danger_height1);
     //assign v_start2 = (danger_y2 - danger_height2);
     //assign v_start3 = (danger_y3 - danger_height3);
-    assign valid1 = ((danger_pos1 > danger_width1 ? danger_pos1 - danger_width1 : 0) < h_addr && h_addr < danger_pos1) && ((danger_y1 - danger_height1) < v_addr && v_addr < danger_y1);
-    assign valid2 = ((danger_pos2 > danger_width2 ? danger_pos2 - danger_width2 : 0) < h_addr && h_addr < danger_pos2) && ((danger_y2 - danger_height2) < v_addr && v_addr < danger_y2);
-    assign valid3 = ((danger_pos3 > danger_width3 ? danger_pos3 - danger_width3 : 0) < h_addr && h_addr < danger_pos3) && ((danger_y3 - danger_height3) < v_addr && v_addr < danger_y3);
-
+    assign valid1 = ((danger_pos1 > danger_width1 ? danger_pos1 - danger_width1 + 2: 0) < h_cnt && h_cnt < danger_pos1) && ((danger_y1 - danger_height1) < v_cnt && v_cnt < danger_y1);
+    assign valid2 = ((danger_pos2 > danger_width2 ? danger_pos2 - danger_width2 + 2: 0) < h_cnt && h_cnt < danger_pos2) && ((danger_y2 - danger_height2) < v_cnt && v_cnt < danger_y2);
+    assign valid3 = ((danger_pos3 > danger_width3 ? danger_pos3 - danger_width3 + 2: 0) < h_cnt && h_cnt < danger_pos3) && ((danger_y3 - danger_height3) < v_cnt && v_cnt < danger_y3);
+    assign on_edge1 = danger_pos1 > danger_width1 ? (h_cnt == (danger_pos1 - danger_width1 + 1)) : (h_cnt == 0);
+    assign on_edge2 = danger_pos2 > danger_width2 ? (h_cnt == (danger_pos2 - danger_width2 + 1)) : (h_cnt == 0);
+    assign on_edge3 = danger_pos3 > danger_width3 ? (h_cnt == (danger_pos3 - danger_width3 + 1)) : (h_cnt == 0);
     ClockDivider #(2) clk2(clk, clk_div2);
     ClockDivider #(22) clk22(clk, clk_div22);
 
+    always @ (*) begin
+        if (v_cnt  ==  `GROUND + 10) begin
+            danger_pos1 = new_danger_pos1;
+            danger_pos2 = new_danger_pos2;
+            danger_pos3 = new_danger_pos3;
+        end else begin
+            // do nothing
+        end
+    end
     always @ (*) begin
         if (danger_en1 == 1) begin
             if (danger_type1 == `SMALL_CACTUS) begin
@@ -72,8 +82,10 @@ module GenPicDanger(
                 danger_width1 = `SMALL_CACTUS_WIDTH;
                 danger_y1 = `GROUND;
                 if (valid1 == 1) begin
-                    pixel_addr_cs = pixel_addr1;
                     pixel1 = pixel_cs;
+                    pixel_addr_cs = pixel_addr1;
+                end else if (on_edge1 == 1) begin
+                    pixel_addr_cs = pixel_addr1;
                 end else begin
                     pixel1 = 12'hFFF;
                 end
@@ -82,8 +94,10 @@ module GenPicDanger(
                 danger_width1 = `MANY_CACTUS_WIDTH;
                 danger_y1 = `GROUND;
                 if (valid1 == 1) begin
-                    pixel_addr_cm = pixel_addr1;
                     pixel1 = pixel_cm;
+                    pixel_addr_cm = pixel_addr1;
+                end else if (on_edge1 == 1) begin
+                    pixel_addr_cm = pixel_addr1;
                 end else begin
                     pixel1 = 12'hFFF;
                 end
@@ -92,8 +106,10 @@ module GenPicDanger(
                 danger_width1 = `BIG_CACTUS_WIDTH;
                 danger_y1 = `GROUND;
                 if (valid1 == 1) begin
-                    pixel_addr_cb = pixel_addr1;
                     pixel1 = pixel_cb;
+                    pixel_addr_cb = pixel_addr1;
+                end else if (on_edge1 == 1) begin
+                    pixel_addr_cb = pixel_addr1;
                 end else begin
                     pixel1 = 12'hFFF;
                 end
@@ -102,8 +118,10 @@ module GenPicDanger(
                 danger_width1 = `BIRD_WIDTH;
                 danger_y1 = `LOW_SKY;
                 if (valid1 == 1) begin
-                    pixel_addr_bd = pixel_addr1;
                     pixel1 = pixel_bd;
+                    pixel_addr_bd = pixel_addr1;
+                end else if (on_edge1 == 1) begin
+                    pixel_addr_bd = pixel_addr1;
                 end else begin
                     pixel1 = 12'hFFF;
                 end
@@ -112,8 +130,10 @@ module GenPicDanger(
                 danger_width1 = `BIRD_WIDTH;
                 danger_y1 = `HIGH_SKY;
                 if (valid1 == 1) begin
-                    pixel_addr_bd = pixel_addr1;
                     pixel1 = pixel_bd;
+                    pixel_addr_bd = pixel_addr1;
+                end else if (on_edge1 == 1) begin
+                    pixel_addr_bd = pixel_addr1;
                 end else begin
                     pixel1 = 12'hFFF;
                 end
@@ -123,15 +143,16 @@ module GenPicDanger(
         end else begin
             pixel1 = 12'hFFF;
         end
-
         if (danger_en2 == 1) begin
             if (danger_type2 == `SMALL_CACTUS) begin
                 danger_height2 = `SMALL_CACTUS_HEIGHT;
-                danger_width2 = `SMALL_CACTUS_WIDTH;
-                danger_y1 = `GROUND;
+                danger_width2 = `SMALL_CACTUS_WIDTH;  
+                danger_y2 = `GROUND;
                 if (valid2 == 1) begin
-                    pixel_addr_cs = pixel_addr2;
                     pixel2 = pixel_cs;
+                    pixel_addr_cs = pixel_addr2;
+                end else if (on_edge2 == 1) begin
+                    pixel_addr_cs = pixel_addr2;
                 end else begin
                     pixel2 = 12'hFFF;
                 end
@@ -140,8 +161,10 @@ module GenPicDanger(
                 danger_width2 = `MANY_CACTUS_WIDTH;
                 danger_y2 = `GROUND;
                 if (valid2 == 1) begin
-                    pixel_addr_cm = pixel_addr2;
                     pixel2 = pixel_cm;
+                    pixel_addr_cm = pixel_addr2;
+                end else if (on_edge2 == 1) begin
+                    pixel_addr_cm = pixel_addr2;
                 end else begin
                     pixel2 = 12'hFFF;
                 end
@@ -150,8 +173,10 @@ module GenPicDanger(
                 danger_width2 = `BIG_CACTUS_WIDTH;
                 danger_y2 = `GROUND;
                 if (valid2 == 1) begin
-                    pixel_addr_cb = pixel_addr2;
                     pixel2 = pixel_cb;
+                    pixel_addr_cb = pixel_addr2;
+                end else if (on_edge2 == 1) begin
+                    pixel_addr_cb = pixel_addr2;
                 end else begin
                     pixel2 = 12'hFFF;
                 end
@@ -160,8 +185,10 @@ module GenPicDanger(
                 danger_width2 = `BIRD_WIDTH;
                 danger_y2 = `LOW_SKY;
                 if (valid2 == 1) begin
-                    pixel_addr_bd = pixel_addr2;
                     pixel2 = pixel_bd;
+                    pixel_addr_bd = pixel_addr2;
+                end else if (on_edge2 == 1) begin
+                    pixel_addr_bd = pixel_addr2;
                 end else begin
                     pixel2 = 12'hFFF;
                 end
@@ -170,8 +197,10 @@ module GenPicDanger(
                 danger_width2 = `BIRD_WIDTH;
                 danger_y2 = `HIGH_SKY;
                 if (valid2 == 1) begin
-                    pixel_addr_bd = pixel_addr2;
                     pixel2 = pixel_bd;
+                    pixel_addr_bd = pixel_addr2;
+                end else if (on_edge2 == 1) begin
+                    pixel_addr_bd = pixel_addr2;
                 end else begin
                     pixel2 = 12'hFFF;
                 end
@@ -187,8 +216,10 @@ module GenPicDanger(
                 danger_width3 = `SMALL_CACTUS_WIDTH;
                 danger_y3 = `GROUND;
                 if (valid3 == 1) begin
-                    pixel_addr_cs = pixel_addr3;
                     pixel3 = pixel_cs;
+                    pixel_addr_cs = pixel_addr3;
+                end else if (on_edge3 == 1) begin
+                    pixel_addr_cs = pixel_addr3;
                 end else begin
                     pixel3 = 12'hFFF;
                 end
@@ -197,8 +228,10 @@ module GenPicDanger(
                 danger_width3 = `MANY_CACTUS_WIDTH;
                 danger_y3 = `GROUND;
                 if (valid3 == 1) begin
-                    pixel_addr_cm = pixel_addr3;
                     pixel3 = pixel_cm;
+                    pixel_addr_cm = pixel_addr3;
+                end else if (on_edge3 == 1) begin
+                    pixel_addr_cm = pixel_addr3;
                 end else begin
                     pixel3 = 12'hFFF;
                 end
@@ -207,18 +240,22 @@ module GenPicDanger(
                 danger_width3 = `BIG_CACTUS_WIDTH;
                 danger_y3 = `GROUND;
                 if (valid3 == 1) begin
-                    pixel_addr_cb = pixel_addr3;
                     pixel3 = pixel_cb;
+                    pixel_addr_cb = pixel_addr3;
+                end else if (on_edge3 == 1) begin
+                    pixel_addr_cb = pixel_addr3;
                 end else begin
                     pixel3 = 12'hFFF;
                 end
             end else if (danger_type3 == `LOW_BIRD) begin
                 danger_height3 = `BIRD_HEIGHT;
                 danger_width3 = `BIRD_WIDTH;
-                danger_y1 = `LOW_SKY;
+                danger_y3 = `LOW_SKY;
                 if (valid3 == 1) begin
-                    pixel_addr_bd = pixel_addr3;
                     pixel3 = pixel_bd;
+                    pixel_addr_bd = pixel_addr3;
+                end else if (on_edge3 == 1) begin
+                    pixel_addr_bd = pixel_addr3;
                 end else begin
                     pixel3 = 12'hFFF;
                 end
@@ -227,8 +264,10 @@ module GenPicDanger(
                 danger_width3 = `BIRD_WIDTH;
                 danger_y3 = `HIGH_SKY;
                 if (valid3 == 1) begin
-                    pixel_addr_bd = pixel_addr3;
                     pixel3 = pixel_bd;
+                    pixel_addr_bd = pixel_addr3;
+                end else if (on_edge3 == 1) begin
+                    pixel_addr_bd = pixel_addr3;
                 end else begin
                     pixel3 = 12'hFFF;
                 end

@@ -1,41 +1,49 @@
 `timescale 1ns / 1ps
+
 module main(
     input wire clk,
     input wire rst,
+    input wire mode,
     output wire [3:0] vgaRed,
     output wire [3:0] vgaGreen,
     output wire [3:0] vgaBlue,
     output wire hsync,
     output wire vsync,
+    output wire [6:0] DISPLAY,
+    output wire [3:0] DIGIT,
     inout wire PS2_DATA,
     inout wire PS2_CLK
     );
 
-    wire clk_div2, clk_div15, game_clk;
+    wire clk_div2, clk_div15, game_clk, clk_div13;
     ClockDivider #(2) clk2(clk, clk_div2);
+    ClockDivider #(13) clk13(clk, clk_div13);
     ClockDivider #(15) clk15(clk, clk_div15);
     GameClock gc(clk, rst, game_clk);
 
-    wire [8:0] dino_pos, danger_pos1, danger_pos2, danger_pos3;
+    wire [9:0] dino_pos, danger_pos1, danger_pos2, danger_pos3;
     wire [2:0] danger_type1, danger_type2, danger_type3;
     wire danger_en1, danger_en2, danger_en3;
-    wire [1:0] danger_num;
+    wire [1:0] danger_num, game_state;
+    wire dino_behavior;
     ObjCtrl obj(
-        clk, 
-        rst, 
-        game_clk, 
-        dino_pos, 
-        danger_pos1, 
-        danger_pos2, 
-        danger_pos3, 
-        danger_type1,
-        danger_type2,
-        danger_type3,
-        danger_en1,
-        danger_en2,
-        danger_en3,
-        PS2_DATA, 
-        PS2_CLK
+        .clk(clk), 
+        .rst(rst), 
+        .game_clk(game_clk), 
+        .dino_pos(dino_pos), 
+        .danger_pos1(danger_pos1), 
+        .danger_pos2(danger_pos2), 
+        .danger_pos3(danger_pos3), 
+        .danger_type1(danger_type1),
+        .danger_type2(danger_type2),
+        .danger_type3(danger_type3),
+        .danger_en1(danger_en1),
+        .danger_en2(danger_en2),
+        .danger_en3(danger_en3),
+        .game_state(game_state),
+        .dino_behavior(dino_behavior),
+        .PS2_DATA(PS2_DATA), 
+        .PS2_CLK(PS2_CLK)
     );
 
     wire [9:0] h_cnt, v_cnt;
@@ -68,6 +76,21 @@ module main(
         danger_vgaBlue
     );
 
+    wire [27:0] display_all;
+    ScoreCounter SC(
+        .game_clk(game_clk),
+        .rst(rst),
+        .game_state(game_state),
+        .mode(mode),
+        .display_all(display_all)
+    );
+
+    SevenSegDisplay SSD(
+        .display_all(display_all),
+        .clk(clk_div13),
+        .DISPLAY(DISPLAY), 
+        .DIGIT(DIGIT)
+    );
     //assign {vgaRed, vgaGreen, vgaBlue} = (valid == 1'b1) ? {dino_vgaRed, dino_vgaGreen, dino_vgaBlue} : 12'h0;
     //assign {vgaRed, vgaGreen, vgaBlue} = (valid == 1'b1) ? {background_vgaRed, background_vgaGreen, background_vgaBlue} : 12'h0;
     //assign {vgaRed, vgaGreen, vgaBlue} = (valid == 1'b1) ? {background_vgaRed & dino_vgaRed, background_vgaGreen & dino_vgaGreen, background_vgaBlue & dino_vgaBlue} : 12'h0;
