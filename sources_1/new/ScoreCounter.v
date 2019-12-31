@@ -18,9 +18,10 @@ module ScoreCounter(
     input rst,
     input game_state,
     input mode,
-    output reg [27:0] display_all
+    output reg [27:0] display_all,
+    output reg [13:0] score
     );
-    reg [13:0] score, high_score;
+    reg [13:0] high_score;
     reg [4:0] counter;
     reg [27:0] display_score, display_high_score;
 

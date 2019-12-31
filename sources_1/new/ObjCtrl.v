@@ -90,6 +90,7 @@ module ObjCtrl(
     always @ (posedge game_clk or posedge rst) begin //danger generator
         if (rst == 1) begin
             ensure_empty_counter = 0;
+            addition_pos = 0;
             danger_pos1 = 0;
             danger_pos2 = 0;
             danger_pos3 = 0;
@@ -103,7 +104,7 @@ module ObjCtrl(
         end else if (game_state == `GAME_START) begin
             if ((danger_en1 & danger_en2 & danger_en3) == 1) begin
                 ensure_empty_counter = 0;
-            end else if (ensure_empty_counter != 511) begin
+            end else if (ensure_empty_counter != 400) begin
                 ensure_empty_counter = ensure_empty_counter + 1;
             end else begin
                 //initialize
@@ -126,7 +127,7 @@ module ObjCtrl(
                     end
 
                 end else begin
-                    ensure_empty_counter = 0;
+                    ensure_empty_counter = ensure_empty_counter - 150;
                 end
                 //get obj
                 if (ramdon_result <= 50) begin

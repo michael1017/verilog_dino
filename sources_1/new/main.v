@@ -4,6 +4,9 @@ module main(
     input wire clk,
     input wire rst,
     input wire mode,
+    input wire _mute,
+    input wire _volUP,
+    input wire _volDOWN,
     output wire [3:0] vgaRed,
     output wire [3:0] vgaGreen,
     output wire [3:0] vgaBlue,
@@ -11,6 +14,11 @@ module main(
     output wire vsync,
     output wire [6:0] DISPLAY,
     output wire [3:0] DIGIT,
+    output wire [4:0] _led_vol,
+    output wire audio_mclk,
+    output wire audio_lrck,
+    output wire audio_sck,
+    output wire audio_sdin,
     inout wire PS2_DATA,
     inout wire PS2_CLK
     );
@@ -77,12 +85,14 @@ module main(
     );
 
     wire [27:0] display_all;
+    wire [13:0] game_score;
     ScoreCounter SC(
         .game_clk(game_clk),
         .rst(rst),
         .game_state(game_state),
         .mode(mode),
-        .display_all(display_all)
+        .display_all(display_all),
+        .score(game_score)
     );
 
     SevenSegDisplay SSD(
@@ -90,6 +100,21 @@ module main(
         .clk(clk_div13),
         .DISPLAY(DISPLAY), 
         .DIGIT(DIGIT)
+    );
+
+    SoundCtrl soundctrl(
+        .clk(clk), // clock from crystal
+        .rst(rst), // active high reset: BTNC
+        ._mute(_mute), // SW: Mute
+        ._volUP(_volUP), // BTN: Vol up
+        ._volDOWN(_volDOWN), // BTN: Vol down
+        .dino_pos(dino_pos),
+        .game_score(game_score),
+        ._led_vol(_led_vol), // LED: volume
+        .audio_mclk(audio_mclk), // master clock
+        .audio_lrck(audio_lrck), // left-right clock
+        .audio_sck(audio_sck), // serial clock
+        .audio_sdin(audio_sdin) // serial audio data input
     );
     //assign {vgaRed, vgaGreen, vgaBlue} = (valid == 1'b1) ? {dino_vgaRed, dino_vgaGreen, dino_vgaBlue} : 12'h0;
     //assign {vgaRed, vgaGreen, vgaBlue} = (valid == 1'b1) ? {background_vgaRed, background_vgaGreen, background_vgaBlue} : 12'h0;
