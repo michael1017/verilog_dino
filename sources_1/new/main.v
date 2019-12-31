@@ -23,6 +23,8 @@ module main(
     inout wire PS2_CLK
     );
 
+    wire [3:0] raw_vgaRed, raw_vgaGreen, raw_vgaBlue;
+
     wire clk_div2, clk_div15, game_clk, clk_div13;
     ClockDivider #(2) clk2(clk, clk_div2);
     ClockDivider #(13) clk13(clk, clk_div13);
@@ -116,10 +118,21 @@ module main(
         .audio_sck(audio_sck), // serial clock
         .audio_sdin(audio_sdin) // serial audio data input
     );
+
+    AnimateDark AD(
+        .clk(clk),
+        .game_score(game_score),
+        .OldVgaRed(raw_vgaRed),
+        .OldVgaGreen(raw_vgaGreen),
+        .OldVgaBlue(raw_vgaBlue),
+        .NewVgaRed(vgaRed),
+        .NewVgaGreen(vgaGreen),
+        .NewVgaBlue(vgaBlue)
+    );
     //assign {vgaRed, vgaGreen, vgaBlue} = (valid == 1'b1) ? {dino_vgaRed, dino_vgaGreen, dino_vgaBlue} : 12'h0;
     //assign {vgaRed, vgaGreen, vgaBlue} = (valid == 1'b1) ? {background_vgaRed, background_vgaGreen, background_vgaBlue} : 12'h0;
     //assign {vgaRed, vgaGreen, vgaBlue} = (valid == 1'b1) ? {background_vgaRed & dino_vgaRed, background_vgaGreen & dino_vgaGreen, background_vgaBlue & dino_vgaBlue} : 12'h0;
-    assign {vgaRed, vgaGreen, vgaBlue} = (valid == 1'b1) ? 
+    assign {raw_vgaRed, raw_vgaGreen, raw_vgaBlue} = (valid == 1'b1) ? 
     {background_vgaRed & dino_vgaRed & danger_vgaRed, background_vgaGreen & dino_vgaGreen & danger_vgaGreen, background_vgaBlue & dino_vgaBlue & danger_vgaBlue} : 12'h0;
     //{background_vgaRed & dino_vgaRed, background_vgaGreen & dino_vgaGreen, background_vgaBlue & dino_vgaBlue} : 12'b1111_1111_1111;
 endmodule

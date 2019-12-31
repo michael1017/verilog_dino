@@ -1,5 +1,9 @@
 `define GROUND 298
 `define silence   32'd50000000
+
+`define no_sound 0
+`define jump_sound 1
+`define score_sound 2
 module SoundCtrl(
     clk, // clock from crystal
     rst, // active high reset: BTNC
@@ -43,6 +47,7 @@ module SoundCtrl(
     reg jump = 0;
     reg score = 0;
     reg [9:0] old_dino_pos = `GROUND;
+    reg [1:0] play_state;
 
     assign freq_outL = 50000000 / ((_mute == 1'b0) ? `silence : freqL); // Note gen makes no sound, if freq_out = 50000000 / `silence = 1
     assign freq_outR = 50000000 / ((_mute == 1'b0) ? `silence : freqR);
@@ -74,12 +79,14 @@ module SoundCtrl(
             score = 0;
             _music = 0;
             old_dino_pos = dino_pos;
-        end else begin
+        end else if (play_state == `no_sound) begin
             jump = 0;
             score = 0;
             _music = 0;
             old_dino_pos = dino_pos;
-        end     
+        end else begin
+            // do nothing
+        end
     end
 
     always @ (posedge clkDiv22, posedge rst) begin
@@ -106,7 +113,8 @@ module SoundCtrl(
         .score(score),
         .jump(jump),
         ._music(_music),
-        .ibeat(ibeatNum)
+        .ibeat(ibeatNum),
+        .play_state(play_state)
     );
 
     // Music module

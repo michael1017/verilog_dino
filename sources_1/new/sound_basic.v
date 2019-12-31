@@ -117,11 +117,11 @@ module player_control (
 	input jump,
 	input score,
 	input _music,
-	output reg [11:0] ibeat
+	output reg [11:0] ibeat,
+    output reg [1:0] play_state = `no_sound
 );
 	parameter LEN = 4095;
     reg [11:0] next_ibeat;
-    reg [1:0] play_state = `no_sound;
 	always @(posedge clk, posedge reset) begin
 		if (reset) begin
 			ibeat <= 0;
