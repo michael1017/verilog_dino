@@ -22,7 +22,7 @@ module ScoreCounter(
     output reg [13:0] score
     );
     reg [13:0] high_score;
-    reg [4:0] counter;
+    reg [5:0] counter;
     reg [27:0] display_score, display_high_score;
 
     always @ (posedge game_clk or posedge rst) begin
@@ -31,7 +31,7 @@ module ScoreCounter(
             high_score = 0;
             counter = 0;
         end else if (game_state == `GAME_START) begin
-            if (counter == 19) begin
+            if (counter == 35) begin
                 score = score + 1;
                 counter = 0;
             end else begin

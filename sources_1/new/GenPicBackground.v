@@ -1,12 +1,18 @@
 `define BACKGROUND_WIDTH 1187
 `define BACKGROUND_HEIGHT 14
 `define BACKGROUND_YPOS 300
+
+`define GAME_INIT  0
+`define GAME_START 1
+`define GAME_END   2
+`define GAME_RESET 3
 module GenPicBackground(
     input wire clk,
     input wire rst,
     input wire game_clk,
     input wire [9:0] h_cnt,
     input wire [9:0] v_cnt,
+    input wire [1:0] game_state,
     output wire [3:0] vgaRed,
     output wire [3:0] vgaGreen,
     output wire [3:0] vgaBlue
@@ -28,11 +34,16 @@ module GenPicBackground(
         if (rst == 1) begin
             xpos = 1187;
         end else begin
-            if (xpos == 0) begin
-                xpos = 1187;
+            if (game_state == `GAME_START) begin
+                if (xpos == 0) begin
+                    xpos = 1187;
+                end else begin
+                    xpos = xpos - 1;
+                end
             end else begin
-                xpos = xpos - 1;
+                xpos = xpos;
             end
+            
         end
     end
     

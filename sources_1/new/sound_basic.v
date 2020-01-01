@@ -114,45 +114,37 @@ endmodule
 module player_control (
 	input clk,
 	input reset,
-	input jump,
-	input score,
 	input _music,
-	output reg [11:0] ibeat,
-    output reg [1:0] play_state = `no_sound
+	input [1:0] play_state,
+	output reg [11:0] ibeat = 4
 );
 	parameter LEN = 4095;
+
     reg [11:0] next_ibeat;
+    reg pre_play_state;
 	always @(posedge clk, posedge reset) begin
 		if (reset) begin
-			ibeat <= 0;
+			ibeat <= LEN;
+			pre_play_state <= play_state;
 		end else begin
-			ibeat <= next_ibeat;
+			if (play_state != pre_play_state && pre_play_state == `no_sound) begin
+				ibeat <= 0;
+				pre_play_state <= play_state;
+			end else begin
+				ibeat <= next_ibeat;
+				pre_play_state <= play_state;
+			end      
 		end
 	end
-
-    always @ (posedge clk) begin
-        if (score == 1) begin
-            next_ibeat = 0;
-            play_state = `score_sound;
-        end else if (play_state == `no_sound && jump == 1) begin
-            next_ibeat = 0;
-            play_state = `jump_sound;
+	
+    
+    always @ (*) begin
+        if (play_state == `score_sound) begin
+            next_ibeat = (ibeat + 1 < LEN) ? (ibeat + 1) : LEN;
         end else if (play_state == `jump_sound) begin
-            if (ibeat + 1 < LEN) begin
-                next_ibeat = ibeat + 1;
-            end else begin
-                next_ibeat = LEN;
-                play_state = `no_sound;
-            end
-        end else if (play_state == `score_sound) begin
-            if (ibeat + 1 < LEN) begin
-                next_ibeat = ibeat + 1;
-            end else begin
-                next_ibeat = LEN;
-                play_state = `no_sound;
-            end
+            next_ibeat = (ibeat + 1 < LEN) ? (ibeat + 1) : LEN;
         end else begin
-            
+            next_ibeat = LEN;
         end
     end
 

@@ -24,7 +24,7 @@ module main(
     );
 
     wire [3:0] raw_vgaRed, raw_vgaGreen, raw_vgaBlue;
-
+    wire isColision;
     wire clk_div2, clk_div15, game_clk, clk_div13;
     ClockDivider #(2) clk2(clk, clk_div2);
     ClockDivider #(13) clk13(clk, clk_div13);
@@ -40,6 +40,7 @@ module main(
         .clk(clk), 
         .rst(rst), 
         .game_clk(game_clk), 
+        .isColision(isColision),
         .dino_pos(dino_pos), 
         .danger_pos1(danger_pos1), 
         .danger_pos2(danger_pos2), 
@@ -61,10 +62,10 @@ module main(
     vga_controller vga_ctrl(clk_div2, rst, hsync, vsync, valid, h_cnt, v_cnt);
 
     wire [3:0] background_vgaRed, background_vgaGreen, background_vgaBlue;
-    GenPicBackground GPB(clk, rst, game_clk, h_cnt, v_cnt, background_vgaRed, background_vgaGreen, background_vgaBlue);
+    GenPicBackground GPB(clk, rst, game_clk, h_cnt, v_cnt, game_state, background_vgaRed, background_vgaGreen, background_vgaBlue);
 
     wire [3:0] dino_vgaRed, dino_vgaGreen, dino_vgaBlue;
-    GenPicDino GPDino(clk, rst, dino_pos, h_cnt, v_cnt, dino_vgaRed, dino_vgaGreen, dino_vgaBlue);
+    GenPicDino GPDino(clk, rst, dino_pos, h_cnt, v_cnt, dino_behavior, dino_vgaRed, dino_vgaGreen, dino_vgaBlue);
 
     wire [3:0] danger_vgaRed, danger_vgaGreen, danger_vgaBlue;
     GenPicDanger GPDanger(
@@ -121,6 +122,7 @@ module main(
 
     AnimateDark AD(
         .clk(clk),
+        .valid(valid),
         .game_score(game_score),
         .OldVgaRed(raw_vgaRed),
         .OldVgaGreen(raw_vgaGreen),
@@ -128,6 +130,15 @@ module main(
         .NewVgaRed(vgaRed),
         .NewVgaGreen(vgaGreen),
         .NewVgaBlue(vgaBlue)
+    );
+    
+    
+    ObjColision obj_colision(
+        .clk(clk),
+        .dinoRGB({dino_vgaRed, dino_vgaGreen, dino_vgaBlue}),
+        .dangerRGB({danger_vgaRed, danger_vgaGreen, danger_vgaBlue}),
+        .game_state(game_state),
+        .isColision(isColision)
     );
     //assign {vgaRed, vgaGreen, vgaBlue} = (valid == 1'b1) ? {dino_vgaRed, dino_vgaGreen, dino_vgaBlue} : 12'h0;
     //assign {vgaRed, vgaGreen, vgaBlue} = (valid == 1'b1) ? {background_vgaRed, background_vgaGreen, background_vgaBlue} : 12'h0;

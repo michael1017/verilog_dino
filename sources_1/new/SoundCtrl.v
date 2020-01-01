@@ -4,6 +4,15 @@
 `define no_sound 0
 `define jump_sound 1
 `define score_sound 2
+
+`define CTRL_NONE  0
+`define CTRL_JUMP  1
+`define CTRL_SCORE 2
+
+`define no_sound 0
+`define jump_sound 1
+`define score_sound 2
+`define SONG_LEN 4
 module SoundCtrl(
     clk, // clock from crystal
     rst, // active high reset: BTNC
@@ -44,13 +53,12 @@ module SoundCtrl(
     wire [31:0] freqL, freqR; // Raw frequency, produced by music module
     wire [21:0] freq_outL, freq_outR; // Processed Frequency, adapted to the clock rate of Basys3
     reg _music = 0;
-    reg jump = 0;
-    reg score = 0;
     reg [9:0] old_dino_pos = `GROUND;
-    reg [1:0] play_state;
+    reg [1:0] play_state = `no_sound;
+    wire [1:0] ctrl_state = `CTRL_NONE;
 
-    assign freq_outL = 50000000 / ((_mute == 1'b0) ? `silence : freqL); // Note gen makes no sound, if freq_out = 50000000 / `silence = 1
-    assign freq_outR = 50000000 / ((_mute == 1'b0) ? `silence : freqR);
+    assign freq_outL = 50000000 / ((_mute == 1'b1) ? `silence : freqL); // Note gen makes no sound, if freq_out = 50000000 / `silence = 1
+    assign freq_outR = 50000000 / ((_mute == 1'b1) ? `silence : freqR);
 
     ClockDivider #(.n(22)) clock_22(
         .clk(clk),
@@ -70,22 +78,21 @@ module SoundCtrl(
 
     always @ (posedge clk) begin
         if (game_score % 100 == 0 && game_score != 0) begin
-            jump = 0;
-            score = 1;
             _music = 1;
             old_dino_pos = dino_pos;
-        end else if (old_dino_pos == `GROUND && dino_pos != `GROUND) begin
-            jump = 1;
-            score = 0;
+            play_state = `score_sound;
+        end else if (old_dino_pos == `GROUND && dino_pos != `GROUND && play_state == `no_sound) begin
             _music = 0;
             old_dino_pos = dino_pos;
-        end else if (play_state == `no_sound) begin
-            jump = 0;
-            score = 0;
+            play_state = `jump_sound;
+        end else if (play_state != `no_sound && ibeatNum == `SONG_LEN) begin
             _music = 0;
             old_dino_pos = dino_pos;
+            play_state = `no_sound;
         end else begin
-            // do nothing
+            _music = _music;
+            old_dino_pos = dino_pos;
+            play_state = play_state;
         end
     end
 
@@ -107,14 +114,12 @@ module SoundCtrl(
         end 
     end
     // Player Control
-    player_control #(.LEN(4)) playerCtrl_00 ( 
+    player_control #(.LEN(`SONG_LEN)) playerCtrl_00 ( 
         .clk(clkDiv22),
         .reset(rst),
-        .score(score),
-        .jump(jump),
+        .play_state(play_state),
         ._music(_music),
-        .ibeat(ibeatNum),
-        .play_state(play_state)
+        .ibeat(ibeatNum)
     );
 
     // Music module

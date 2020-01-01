@@ -41,6 +41,7 @@ module ObjCtrl(
     input wire clk, 
     input wire rst, 
     input wire game_clk,
+    input wire isColision,
     output reg [9:0] dino_pos, 
     output reg [9:0] danger_pos1, 
     output reg [9:0] danger_pos2,
@@ -247,9 +248,10 @@ module ObjCtrl(
                         dino_behavior = `DINO_SIT;
                     end
                 end else begin
-                
+                    
                 end
             end else begin
+                dino_behavior = `DINO_STAND;
                 if (dino_start_fall == 1) begin
                     dino_status = `FALL_STATUS;
                     down_speed = down_speed + `GRAVITY;
@@ -326,6 +328,9 @@ module ObjCtrl(
             end
             if (game_state == `GAME_RESET) begin
                 game_state = `GAME_START;
+            end
+            if (isColision) begin
+                game_state = `GAME_END;
             end
         end
     end

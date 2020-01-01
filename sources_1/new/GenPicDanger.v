@@ -60,9 +60,9 @@ module GenPicDanger(
     assign valid1 = ((danger_pos1 > danger_width1 ? danger_pos1 - danger_width1 + 1: 0) < h_cnt && h_cnt < danger_pos1) && ((danger_y1 - danger_height1) < v_cnt && v_cnt < danger_y1);
     assign valid2 = ((danger_pos2 > danger_width2 ? danger_pos2 - danger_width2 + 1: 0) < h_cnt && h_cnt < danger_pos2) && ((danger_y2 - danger_height2) < v_cnt && v_cnt < danger_y2);
     assign valid3 = ((danger_pos3 > danger_width3 ? danger_pos3 - danger_width3 + 1: 0) < h_cnt && h_cnt < danger_pos3) && ((danger_y3 - danger_height3) < v_cnt && v_cnt < danger_y3);
-    assign on_edge1 = danger_pos1 > danger_width1 ? (h_cnt == (danger_pos1 - danger_width1 + 1)) : (h_cnt == 0);
-    assign on_edge2 = danger_pos2 > danger_width2 ? (h_cnt == (danger_pos2 - danger_width2 + 1)) : (h_cnt == 0);
-    assign on_edge3 = danger_pos3 > danger_width3 ? (h_cnt == (danger_pos3 - danger_width3 + 1)) : (h_cnt == 0);
+    assign on_edge1 = danger_pos1 > danger_width1 ? (h_cnt == (danger_pos1 - danger_width1 + 1)) || (h_cnt == (danger_pos1 - danger_width1)) : (h_cnt == 0);
+    assign on_edge2 = danger_pos2 > danger_width2 ? (h_cnt == (danger_pos2 - danger_width2 + 1)) || (h_cnt == (danger_pos2 - danger_width2)) : (h_cnt == 0);
+    assign on_edge3 = danger_pos3 > danger_width3 ? (h_cnt == (danger_pos3 - danger_width3 + 1)) || (h_cnt == (danger_pos3 - danger_width3)) : (h_cnt == 0);
     ClockDivider #(2) clk2(clk, clk_div2);
     ClockDivider #(22) clk22(clk, clk_div22);
 
