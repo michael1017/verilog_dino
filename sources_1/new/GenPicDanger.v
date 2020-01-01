@@ -7,8 +7,8 @@
 `define SMALL_CACTUS_WIDTH 19
 `define MANY_CACTUS_HEIGHT 49
 `define MANY_CACTUS_WIDTH 77 
-`define BIRD_HEIGHT 33
-`define BIRD_WIDTH 44
+`define BIRD_HEIGHT 42
+`define BIRD_WIDTH 47
 
 `define LOW_BIRD     0
 `define HIGH_BIRD    1

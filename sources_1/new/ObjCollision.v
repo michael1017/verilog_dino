@@ -4,15 +4,18 @@
 `define GAME_RESET 3
 
 module ObjColision(
+    input rst,
     input clk,
     input [11:0] dinoRGB,
     input [11:0] dangerRGB,
     input [1:0] game_state,
-    output reg isColision = 0   
+    output reg isColision
     );
 
-    always @ (posedge clk) begin
-        if (isColision == 0) begin
+    always @ (posedge clk or posedge rst) begin
+        if (rst == 1) begin
+            isColision = 0;
+        end else if (isColision == 0) begin
             if (game_state == `GAME_START) begin
                 isColision = (dinoRGB | dangerRGB) != 12'hFFF;
             end else begin

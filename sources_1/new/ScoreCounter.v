@@ -13,10 +13,11 @@
 `define SEVEN 7'b1111000
 `define EIGHT 7'b0000000
 `define NINE 7'b0010000
+`define NONE 7'b1111111
 module ScoreCounter(
     input game_clk,
     input rst,
-    input game_state,
+    input [1:0] game_state,
     input mode,
     output reg [27:0] display_all,
     output reg [13:0] score
@@ -24,6 +25,7 @@ module ScoreCounter(
     reg [13:0] high_score;
     reg [5:0] counter;
     reg [27:0] display_score, display_high_score;
+    reg [3:0] blink_counter;
 
     always @ (posedge game_clk or posedge rst) begin
         if (rst) begin
@@ -38,14 +40,23 @@ module ScoreCounter(
                 counter = counter + 1;
             end
         end else if (game_state == `GAME_END) begin
-            
+            if (score > high_score) begin
+                high_score = score;
+            end else begin
+                high_score = high_score;
+            end
         end else if (game_state == `GAME_RESET) begin
             score = 0;
             counter = 0;
         end else begin 
-
+            score = 0;
+            counter = 0;
         end
     end
+    always @ (posedge game_clk or posedge rst) begin
+        
+    end
+    
     always @ (*) begin
         if (mode == 0) begin
             display_all = display_score;

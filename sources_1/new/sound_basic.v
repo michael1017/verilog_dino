@@ -121,7 +121,7 @@ module player_control (
 	parameter LEN = 4095;
 
     reg [11:0] next_ibeat;
-    reg pre_play_state;
+    reg [1:0] pre_play_state;
 	always @(posedge clk, posedge reset) begin
 		if (reset) begin
 			ibeat <= LEN;
@@ -163,13 +163,15 @@ module music_example (
                 // --- Measure 1 ---
                 12'd0   : toneR = `hc;   12'd1   : toneR = `hc;
                 12'd2   : toneR = `hc;   12'd3   : toneR = `hc;
+                12'd4   : toneR = `hc;   12'd5   : toneR = `hc;
 
                 default: toneR = `sil;
             endcase
         end else begin
             case(ibeatNum)
-                12'd0   : toneR = `hc;   12'd1   : toneR = `hg;
+                12'd0   : toneR = `hc;   12'd1   : toneR = `hc;
                 12'd2   : toneR = `hg;   12'd3   : toneR = `hg;
+                12'd4   : toneR = `hg;   12'd5   : toneR = `hg;
                 default : toneR = `sil;
             endcase
         end
@@ -180,6 +182,7 @@ module music_example (
             case(ibeatNum)
                 12'd0   : toneL = `hc;   12'd1   : toneL = `hc;
                 12'd2   : toneL = `hc;   12'd3   : toneL = `hc;
+                12'd4   : toneL = `hc;   12'd5   : toneL = `hc;
 
                 default : toneL = `sil;
             endcase
@@ -188,6 +191,7 @@ module music_example (
             case(ibeatNum)
                 12'd0   : toneL = `hc;   12'd1   : toneL = `hg;
                 12'd2   : toneL = `hg;   12'd3   : toneL = `hg;
+                12'd24  : toneL = `hg;   12'd5   : toneL = `hg;
                 
                 default : toneL = `sil;
             endcase

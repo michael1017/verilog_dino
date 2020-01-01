@@ -15,7 +15,7 @@ module AnimateDark (
     wire clk_div23;
     ClockDivider #(23) c23(clk, clk_div23);
 
-    reg [3:0] counter = 0;
+    reg [3:0] counter;
     reg state = `TURN_LIGHT;
     reg [13:0] old_score;
 
@@ -34,7 +34,9 @@ module AnimateDark (
     end
 
     always @ (posedge clk_div23) begin
-        if (state == `TURN_DARK) begin
+        if (game_score == 0) begin
+            counter = 0;
+        end else if (state == `TURN_DARK) begin
             if (counter != 15) begin
                 counter = counter + 1;
             end else begin 

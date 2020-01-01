@@ -19,22 +19,24 @@ module main(
     output wire audio_lrck,
     output wire audio_sck,
     output wire audio_sdin,
+    output wire [4:0] key_led,
     inout wire PS2_DATA,
     inout wire PS2_CLK
     );
 
     wire [3:0] raw_vgaRed, raw_vgaGreen, raw_vgaBlue;
     wire isColision;
+    wire [1:0] game_state;
     wire clk_div2, clk_div15, game_clk, clk_div13;
     ClockDivider #(2) clk2(clk, clk_div2);
     ClockDivider #(13) clk13(clk, clk_div13);
     ClockDivider #(15) clk15(clk, clk_div15);
-    GameClock gc(clk, rst, game_clk);
+    GameClock gc(clk, rst, game_state, game_clk);
 
     wire [9:0] dino_pos, danger_pos1, danger_pos2, danger_pos3;
     wire [2:0] danger_type1, danger_type2, danger_type3;
     wire danger_en1, danger_en2, danger_en3;
-    wire [1:0] danger_num, game_state;
+    wire [1:0] danger_num;
     wire dino_behavior;
     ObjCtrl obj(
         .clk(clk), 
@@ -53,6 +55,7 @@ module main(
         .danger_en3(danger_en3),
         .game_state(game_state),
         .dino_behavior(dino_behavior),
+        .key_led(key_led),
         .PS2_DATA(PS2_DATA), 
         .PS2_CLK(PS2_CLK)
     );
@@ -134,6 +137,7 @@ module main(
     
     
     ObjColision obj_colision(
+        .rst(rst),
         .clk(clk),
         .dinoRGB({dino_vgaRed, dino_vgaGreen, dino_vgaBlue}),
         .dangerRGB({danger_vgaRed, danger_vgaGreen, danger_vgaBlue}),

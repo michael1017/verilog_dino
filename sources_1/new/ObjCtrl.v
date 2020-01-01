@@ -30,8 +30,8 @@
 `define SMALL_CACTUS_WIDTH 19
 `define MANY_CACTUS_HEIGHT 49
 `define MANY_CACTUS_WIDTH 77 
-`define BIRD_HEIGHT 33
-`define BIRD_WIDTH 44
+`define BIRD_HEIGHT 42
+`define BIRD_WIDTH 47
 
 `define GAME_INIT  0
 `define GAME_START 1
@@ -54,6 +54,7 @@ module ObjCtrl(
     output reg danger_en3,
     output reg dino_behavior,
     output reg [1:0] game_state,
+    output reg [4:0] key_led,
     inout wire PS2_DATA,
     inout wire PS2_CLK
     );
@@ -309,29 +310,54 @@ module ObjCtrl(
         if (rst == 1) begin
             game_state = `GAME_INIT;
         end else begin
-            if (key_num == `ENTER) begin
-                if (game_state == `GAME_END) begin
-                    game_state = `GAME_RESET;
+            if (game_state == `GAME_END) begin
+                if (keyin == 1) begin
+                    if (key_num == `ENTER) begin
+                        game_state = `GAME_RESET;
+                    end else if (key_num == `UP || key_num == `SPACE) begin
+                        game_state = `GAME_RESET;
+                    end else begin
+                        game_state = `GAME_END;
+                    end
                 end else begin
                     
                 end
-            end else if (key_num == `UP || key_num == `SPACE) begin
-                if (game_state == `GAME_END) begin
-                    game_state = `GAME_RESET;
-                end else if (game_state == `GAME_INIT ) begin
+            end else if (game_state == `GAME_START) begin
+                if (isColision) begin
+                    game_state = `GAME_END;
+                end else begin
                     game_state = `GAME_START;
+                end
+            end else if (game_state == `GAME_RESET) begin
+                game_state = `GAME_START;
+            end else begin // game_init
+                if (keyin == 1) begin
+                    if (key_num == `UP || key_num == `SPACE) begin
+                        game_state = `GAME_START;
+                    end else begin
+                        game_state = `GAME_INIT;
+                    end
                 end else begin
                     
                 end
-            end else begin
-                // do nothing
+                
             end
-            if (game_state == `GAME_RESET) begin
-                game_state = `GAME_START;
-            end
-            if (isColision) begin
-                game_state = `GAME_END;
-            end
+        end
+    end
+
+    always @ (posedge clk) begin
+        if (key_num == `ENTER) begin
+            key_led = 5'b10000;
+        end else if (key_num == `SPACE) begin
+            key_led = 5'b01000;
+        end else if (key_num == `UP) begin
+            key_led = 5'b00100;
+        end else if (key_num == `DOWN) begin
+            key_led = 5'b00010;
+        end else if (keyin == 1) begin
+            key_led = 5'b00001;
+        end else begin
+            key_led = 5'b00000;
         end
     end
 endmodule
