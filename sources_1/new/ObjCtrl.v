@@ -87,12 +87,12 @@ module ObjCtrl(
     reg dino_start_fall;
     reg [8:0] ensure_empty_counter;
     reg [2:0] next_danger_type;
-    reg [6:0] addition_pos;
+    reg [7:0] addition_pos;
 
     always @ (posedge game_clk or posedge rst) begin //danger generator
         if (rst == 1) begin
             ensure_empty_counter = 0;
-            addition_pos = 0;
+            addition_pos = 100;
             danger_pos1 = 0;
             danger_pos2 = 0;
             danger_pos3 = 0;
@@ -134,22 +134,22 @@ module ObjCtrl(
                 //get obj
                 if (ramdon_result <= 50) begin
                     next_danger_type = `NOTHING;
-                    addition_pos = 0;
+                    //addition_pos = 0;
                 end else if (ramdon_result <= 60) begin
                     next_danger_type = `BIG_CACTUS;
-                    addition_pos = `BIG_CACTUS_WIDTH;
+                    //addition_pos = `BIG_CACTUS_WIDTH + 30;
                 end else if (ramdon_result <= 70) begin
                     next_danger_type = `SMALL_CACTUS;
-                    addition_pos = `SMALL_CACTUS_WIDTH;
+                    //addition_pos = `SMALL_CACTUS_WIDTH + 30;
                 end else if (ramdon_result <= 80) begin
                     next_danger_type = `MANY_CACTUS;
-                    addition_pos = `MANY_CACTUS_WIDTH;
+                    //addition_pos = `MANY_CACTUS_WIDTH + 30;
                 end else if (ramdon_result <= 90)begin
                     next_danger_type = `LOW_BIRD;
-                    addition_pos = `BIRD_WIDTH;
+                    //addition_pos = `BIRD_WIDTH + 30;
                 end else begin
                     next_danger_type = `HIGH_BIRD;
-                    addition_pos = `BIRD_WIDTH;
+                    //addition_pos = `BIRD_WIDTH + 30;
                 end
             end
             //recycle and move

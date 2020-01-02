@@ -49,6 +49,7 @@ module GenPicBackground(
     wire [11:0] cloudRGB1, cloudRGB2, cloudRGB3;
     reg [10:0] cloud_xpos1, cloud_xpos2, cloud_xpos3;
     reg [10:0] cloud_ypos1, cloud_ypos2, cloud_ypos3;
+    wire [9:0] cloud_h_start1, cloud_h_start2, cloud_h_start3;
     reg cloud_en1, cloud_en2, cloud_en3;
     reg [16:0] keep_cloud_distance;
 
@@ -58,9 +59,12 @@ module GenPicBackground(
     assign game_over_valid = (`PIC_GAME_OVER_YPOS - `PIC_GAME_OVER_HEIGHT < v_cnt && v_cnt < `PIC_GAME_OVER_YPOS) && (`PIC_GAME_OVER_XPOS - `PIC_GAME_OVER_WIDTH < h_cnt && h_cnt < `PIC_GAME_OVER_XPOS);
     assign gameRGB = game_state == `GAME_END ? (game_over_valid ? game_over_pixel : 12'hFFF) : 12'hFFF;
 
-    assign cloud_pixel_valid1 = (cloud_ypos1 - `CLOUD_HEIGHT < v_cnt && v_cnt < cloud_ypos1) && ((cloud_xpos1 > `CLOUD_WIDTH ? cloud_xpos1 - `CLOUD_WIDTH + 1 : 0) < h_cnt && h_cnt < cloud_xpos1) && cloud_en1;
-    assign cloud_pixel_valid2 = (cloud_ypos2 - `CLOUD_HEIGHT < v_cnt && v_cnt < cloud_ypos2) && ((cloud_xpos2 > `CLOUD_WIDTH ? cloud_xpos2 - `CLOUD_WIDTH + 1 : 0) < h_cnt && h_cnt < cloud_xpos2) && cloud_en2;
-    assign cloud_pixel_valid3 = (cloud_ypos3 - `CLOUD_HEIGHT < v_cnt && v_cnt < cloud_ypos3) && ((cloud_xpos3 > `CLOUD_WIDTH ? cloud_xpos3 - `CLOUD_WIDTH + 1 : 0) < h_cnt && h_cnt < cloud_xpos3) && cloud_en3;
+    assign cloud_pixel_valid1 = cloud_en1 && (cloud_ypos1 - `CLOUD_HEIGHT < v_cnt && v_cnt < cloud_ypos1) && (cloud_h_start1 < h_cnt && h_cnt < cloud_xpos1);
+    assign cloud_pixel_valid2 = cloud_en2 && (cloud_ypos2 - `CLOUD_HEIGHT < v_cnt && v_cnt < cloud_ypos2) && (cloud_h_start2 < h_cnt && h_cnt < cloud_xpos2);
+    assign cloud_pixel_valid3 = cloud_en3 && (cloud_ypos3 - `CLOUD_HEIGHT < v_cnt && v_cnt < cloud_ypos3) && (cloud_h_start3 < h_cnt && h_cnt < cloud_xpos3);
+    assign cloud_h_start1 = cloud_xpos1 > `CLOUD_WIDTH ? cloud_xpos1 - `CLOUD_WIDTH + 1 : 0;
+    assign cloud_h_start2 = cloud_xpos2 > `CLOUD_WIDTH ? cloud_xpos2 - `CLOUD_WIDTH + 1 : 0;
+    assign cloud_h_start3 = cloud_xpos3 > `CLOUD_WIDTH ? cloud_xpos3 - `CLOUD_WIDTH + 1 : 0;
     assign cloudRGB1 = cloud_pixel_valid1 ? cloud_pixel1 : 12'hFFF;
     assign cloudRGB2 = cloud_pixel_valid2 ? cloud_pixel2 : 12'hFFF;
     assign cloudRGB3 = cloud_pixel_valid3 ? cloud_pixel3 : 12'hFFF;
@@ -99,14 +103,15 @@ module GenPicBackground(
             cloud_ypos2 = 0;
             cloud_ypos3 = 0;
         end else begin
-            if (keep_cloud_distance != 50000) begin
+            if (keep_cloud_distance <= 200) begin
                 keep_cloud_distance = keep_cloud_distance + 1;
             end else begin
                 if (cloud_en1 & cloud_en2 & cloud_en3 == 1) begin
-                    keep_cloud_distance = 0;
+                    keep_cloud_distance = 50;
                 end else begin
-                    if (ramdon_result < 20) begin
-                        keep_cloud_distance = 25000;
+                    keep_cloud_distance = 0;
+                    if (ramdon_result < 10) begin
+                        keep_cloud_distance = 80;
                     end else if (cloud_en1 == 0) begin
                         cloud_en1 = 1;
                         cloud_xpos1 = `WINDOW_WIDTH + `CLOUD_WIDTH;

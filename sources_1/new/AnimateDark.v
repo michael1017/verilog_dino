@@ -31,8 +31,12 @@ module AnimateDark (
         end else  begin
 
         end
+        if (game_score == 0) begin
+            state = `TURN_LIGHT;
+        end else begin
+            
+        end
     end
-
     always @ (posedge clk_div23) begin
         if (game_score == 0) begin
             counter = 0;

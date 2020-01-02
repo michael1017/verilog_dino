@@ -50,11 +50,11 @@ module GenPicDino(
     assign is_dead = game_state == `GAME_END;
 
     //assign {vgaRed, vgaGreen, vgaBlue} = pixel;
-    assign stand_valid = (stand_h_start + 2 < h_cnt && h_cnt < `DINO_X) && (stand_v_start < v_cnt && v_cnt < pos);
-    assign sit_valid   = (sit_h_start   + 2 < h_cnt && h_cnt < `DINO_X) && (sit_v_start   < v_cnt && v_cnt < pos);
-    assign stand_h_start = `DINO_X - `DINO_WIDTH;
+    assign stand_valid = (stand_h_start < h_cnt && h_cnt < `DINO_X) && (stand_v_start < v_cnt && v_cnt < pos);
+    assign sit_valid   = (sit_h_start   < h_cnt && h_cnt < `DINO_X) && (sit_v_start   < v_cnt && v_cnt < pos);
+    assign stand_h_start = `DINO_X - `DINO_WIDTH + 5;
     assign stand_v_start = pos - `DINO_HEIGHT;
-    assign sit_h_start = `DINO_X - `DINO_SIT_WIDTH;
+    assign sit_h_start = `DINO_X - `DINO_SIT_WIDTH + 3;
     assign sit_v_start = pos - `DINO_SIT_HEIGHT;
     //assign in_update_space = 
 

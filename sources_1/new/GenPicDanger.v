@@ -55,6 +55,7 @@ module GenPicDanger(
     reg [9:0] danger_pos1, danger_pos2, danger_pos3;
     wire on_edge1, on_edge2, on_edge3;
     wire is_game_start;
+    wire [9:0] danger_h_start1, danger_h_start2, danger_h_start3;
     //wire [8:0] h_start1, h_start2, h_start3, v_start1, v_start2, v_start3;
 
 
@@ -65,12 +66,15 @@ module GenPicDanger(
     //assign v_start1 = (danger_y1 - danger_height1);
     //assign v_start2 = (danger_y2 - danger_height2);
     //assign v_start3 = (danger_y3 - danger_height3);
-    assign valid1 = ((danger_pos1 > danger_width1 ? danger_pos1 - danger_width1 + 1: 0) < h_cnt && h_cnt <= danger_pos1) && ((danger_y1 - danger_height1) < v_cnt && v_cnt < danger_y1);
-    assign valid2 = ((danger_pos2 > danger_width2 ? danger_pos2 - danger_width2 + 1: 0) < h_cnt && h_cnt <= danger_pos2) && ((danger_y2 - danger_height2) < v_cnt && v_cnt < danger_y2);
-    assign valid3 = ((danger_pos3 > danger_width3 ? danger_pos3 - danger_width3 + 1: 0) < h_cnt && h_cnt <= danger_pos3) && ((danger_y3 - danger_height3) < v_cnt && v_cnt < danger_y3);
+    assign valid1 = (danger_h_start1 < h_cnt && h_cnt <= danger_pos1) && ((danger_y1 - danger_height1) < v_cnt && v_cnt < danger_y1);
+    assign valid2 = (danger_h_start2 < h_cnt && h_cnt <= danger_pos2) && ((danger_y2 - danger_height2) < v_cnt && v_cnt < danger_y2);
+    assign valid3 = (danger_h_start3 < h_cnt && h_cnt <= danger_pos3) && ((danger_y3 - danger_height3) < v_cnt && v_cnt < danger_y3);
     assign on_edge1 = danger_pos1 > danger_width1 ? (h_cnt == (danger_pos1 - danger_width1 + 1)) || (h_cnt == (danger_pos1 - danger_width1)) : (h_cnt == 0);
     assign on_edge2 = danger_pos2 > danger_width2 ? (h_cnt == (danger_pos2 - danger_width2 + 1)) || (h_cnt == (danger_pos2 - danger_width2)) : (h_cnt == 0);
     assign on_edge3 = danger_pos3 > danger_width3 ? (h_cnt == (danger_pos3 - danger_width3 + 1)) || (h_cnt == (danger_pos3 - danger_width3)) : (h_cnt == 0);
+    assign danger_h_start1 = danger_pos1 > danger_width1 ? danger_pos1 - danger_width1 + 1: 0;
+    assign danger_h_start2 = danger_pos2 > danger_width2 ? danger_pos2 - danger_width2 + 1: 0;
+    assign danger_h_start3 = danger_pos3 > danger_width3 ? danger_pos3 - danger_width3 + 1: 0;
     assign pixel_bd = is_game_start ? (clk_div25 ? pixel_bd_low : pixel_bd_high) : pixel_bd_low;
     assign is_game_start = game_state == `GAME_START;
     
