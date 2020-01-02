@@ -34,7 +34,11 @@ module ScoreCounter(
             counter = 0;
         end else if (game_state == `GAME_START) begin
             if (counter == 35) begin
-                score = score + 1;
+                if (score == 9999) begin
+                    high_score = score;
+                end else begin
+                    score = score + 1;
+                end
                 counter = 0;
             end else begin
                 counter = counter + 1;
@@ -52,9 +56,6 @@ module ScoreCounter(
             score = 0;
             counter = 0;
         end
-    end
-    always @ (posedge game_clk or posedge rst) begin
-        
     end
     
     always @ (*) begin

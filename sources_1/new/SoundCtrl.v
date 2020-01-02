@@ -5,14 +5,10 @@
 `define jump_sound 1
 `define score_sound 2
 
-`define CTRL_NONE  0
-`define CTRL_JUMP  1
-`define CTRL_SCORE 2
-
 `define no_sound 0
 `define jump_sound 1
 `define score_sound 2
-`define SONG_LEN 4
+`define SONG_LEN 6
 module SoundCtrl(
     clk, // clock from crystal
     rst, // active high reset: BTNC
@@ -53,12 +49,11 @@ module SoundCtrl(
     wire [31:0] freqL, freqR; // Raw frequency, produced by music module
     wire [21:0] freq_outL, freq_outR; // Processed Frequency, adapted to the clock rate of Basys3
     reg _music = 0;
-    reg [9:0] old_dino_pos = `GROUND;
-    reg [1:0] play_state = `no_sound;
-    wire [1:0] ctrl_state = `CTRL_NONE;
+    reg [9:0] old_dino_pos;
+    reg [1:0] play_state;
 
-    assign freq_outL = 50000000 / ((_mute == 1'b1) ? `silence : freqL); // Note gen makes no sound, if freq_out = 50000000 / `silence = 1
-    assign freq_outR = 50000000 / ((_mute == 1'b1) ? `silence : freqR);
+    assign freq_outL = 50000000 / ((_mute == 1'b1) || play_state == `no_sound ? `silence : freqL); // Note gen makes no sound, if freq_out = 50000000 / `silence = 1
+    assign freq_outR = 50000000 / ((_mute == 1'b1) || play_state == `no_sound ? `silence : freqR);
 
     ClockDivider #(.n(22)) clock_22(
         .clk(clk),
@@ -76,8 +71,12 @@ module SoundCtrl(
     OnePulse o_volUP(volUP, _volUP_d, clkDiv22);
     OnePulse o_volDOWN(volDOWN, _volDOWN_d, clkDiv22);
 
-    always @ (posedge clk) begin
-        if (game_score % 100 == 0 && game_score != 0) begin
+    always @ (posedge clk or posedge rst) begin
+        if (rst) begin
+            _music = 1;
+            old_dino_pos = dino_pos;
+            play_state = `no_sound;
+        end else if (game_score % 100 == 0 && game_score != 0) begin
             _music = 1;
             old_dino_pos = dino_pos;
             play_state = `score_sound;
@@ -85,7 +84,7 @@ module SoundCtrl(
             _music = 0;
             old_dino_pos = dino_pos;
             play_state = `jump_sound;
-        end else if (play_state != `no_sound && ibeatNum == `SONG_LEN) begin
+        end else if (play_state != `no_sound && ibeatNum == `SONG_LEN - 1) begin
             _music = 0;
             old_dino_pos = dino_pos;
             play_state = `no_sound;

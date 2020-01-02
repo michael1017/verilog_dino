@@ -68,7 +68,7 @@ module main(
     GenPicBackground GPB(clk, rst, game_clk, h_cnt, v_cnt, game_state, background_vgaRed, background_vgaGreen, background_vgaBlue);
 
     wire [3:0] dino_vgaRed, dino_vgaGreen, dino_vgaBlue;
-    GenPicDino GPDino(clk, rst, dino_pos, h_cnt, v_cnt, dino_behavior, dino_vgaRed, dino_vgaGreen, dino_vgaBlue);
+    GenPicDino GPDino(clk, rst, dino_pos, h_cnt, v_cnt, dino_behavior, game_state, dino_vgaRed, dino_vgaGreen, dino_vgaBlue);
 
     wire [3:0] danger_vgaRed, danger_vgaGreen, danger_vgaBlue;
     GenPicDanger GPDanger(
@@ -85,6 +85,7 @@ module main(
         danger_en3,
         h_cnt,
         v_cnt,
+        game_state,
         danger_vgaRed,
         danger_vgaGreen,   
         danger_vgaBlue

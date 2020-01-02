@@ -116,35 +116,19 @@ module player_control (
 	input reset,
 	input _music,
 	input [1:0] play_state,
-	output reg [11:0] ibeat = 4
+	output reg [11:0] ibeat
 );
 	parameter LEN = 4095;
-
-    reg [11:0] next_ibeat;
-    reg [1:0] pre_play_state;
-	always @(posedge clk, posedge reset) begin
-		if (reset) begin
-			ibeat <= LEN;
-			pre_play_state <= play_state;
-		end else begin
-			if (play_state != pre_play_state && pre_play_state == `no_sound) begin
-				ibeat <= 0;
-				pre_play_state <= play_state;
-			end else begin
-				ibeat <= next_ibeat;
-				pre_play_state <= play_state;
-			end      
-		end
-	end
-	
     
-    always @ (*) begin
-        if (play_state == `score_sound) begin
-            next_ibeat = (ibeat + 1 < LEN) ? (ibeat + 1) : LEN;
+    always @ (posedge clk) begin
+        if (play_state == `no_sound) begin
+            ibeat = 0;
+        end else if (play_state == `score_sound) begin
+            ibeat = (ibeat + 1 < LEN) ? (ibeat + 1) : 0;
         end else if (play_state == `jump_sound) begin
-            next_ibeat = (ibeat + 1 < LEN) ? (ibeat + 1) : LEN;
+            ibeat = (ibeat + 1 < LEN) ? (ibeat + 1) : 0;
         end else begin
-            next_ibeat = LEN;
+            ibeat = 0;
         end
     end
 
@@ -163,7 +147,7 @@ module music_example (
                 // --- Measure 1 ---
                 12'd0   : toneR = `hc;   12'd1   : toneR = `hc;
                 12'd2   : toneR = `hc;   12'd3   : toneR = `hc;
-                12'd4   : toneR = `hc;   12'd5   : toneR = `hc;
+                12'd4   : toneR = `sil;   12'd5   : toneR = `sil;
 
                 default: toneR = `sil;
             endcase
@@ -182,7 +166,7 @@ module music_example (
             case(ibeatNum)
                 12'd0   : toneL = `hc;   12'd1   : toneL = `hc;
                 12'd2   : toneL = `hc;   12'd3   : toneL = `hc;
-                12'd4   : toneL = `hc;   12'd5   : toneL = `hc;
+                12'd4   : toneL = `sil;   12'd5   : toneL = `sil;
 
                 default : toneL = `sil;
             endcase
