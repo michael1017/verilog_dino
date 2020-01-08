@@ -129,16 +129,19 @@ module GenPicBackground(
             end
             if (cloud_xpos1 == 0) begin
                 cloud_en1 = 0;
+                cloud_ypos1 = 0;
             end else begin
                 cloud_xpos1 = game_state == `GAME_START ? cloud_xpos1 - 1 : cloud_xpos1;
             end
             if (cloud_xpos2 == 0) begin
                 cloud_en2 = 0;
+                cloud_ypos2 = 0;
             end else begin
                 cloud_xpos2 = game_state == `GAME_START ? cloud_xpos2 - 1 : cloud_xpos2;
             end
             if (cloud_xpos3 == 0) begin
                 cloud_en3 = 0;
+                cloud_ypos3 = 0;
             end else begin
                 cloud_xpos3 = game_state == `GAME_START ? cloud_xpos3 - 1 : cloud_xpos3;
             end

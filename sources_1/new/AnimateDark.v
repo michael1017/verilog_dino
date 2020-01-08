@@ -26,7 +26,7 @@ module AnimateDark (
         if (game_score % 700 == 0 && game_score != 0) begin
             state = `TURN_DARK;
             old_score = game_score;
-        end else if (game_score - old_score == 150 && state == `TURN_DARK) begin
+        end else if (game_score - old_score == 200 && state == `TURN_DARK) begin
             state = `TURN_LIGHT;
         end else  begin
 

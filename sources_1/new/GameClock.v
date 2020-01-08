@@ -28,10 +28,10 @@ module GameClock(
                 if(counter < divider) begin
                     counter <= counter + 1;
                 end else begin
-                    if (full == 9999) begin
+                    if (full == 3499) begin
                         full <= 0;
-                        if (divider > 80000) begin
-                            divider <= divider - 10000;
+                        if (divider > 122000) begin
+                            divider <= divider - 4000;
                         end else begin
                             divider <= divider;
                         end
