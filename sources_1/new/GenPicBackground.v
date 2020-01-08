@@ -51,7 +51,7 @@ module GenPicBackground(
     reg [10:0] cloud_ypos1, cloud_ypos2, cloud_ypos3;
     wire [9:0] cloud_h_start1, cloud_h_start2, cloud_h_start3;
     reg cloud_en1, cloud_en2, cloud_en3;
-    reg [16:0] keep_cloud_distance;
+    reg [7:0] keep_cloud_distance;
 
     assign {vgaRed, vgaGreen, vgaBlue} = backgroundRGB & gameRGB & cloudRGB1 & cloudRGB2 & cloudRGB3;
     assign backgroundRGB = valid ? pixel_next : 12'hFFF;  
@@ -103,8 +103,8 @@ module GenPicBackground(
             cloud_ypos2 = 0;
             cloud_ypos3 = 0;
         end else begin
-            if (keep_cloud_distance <= 200) begin
-                keep_cloud_distance = keep_cloud_distance + 1;
+            if (keep_cloud_distance <= 150) begin
+                keep_cloud_distance = game_state == `GAME_START ? keep_cloud_distance + 1 : 0;
             end else begin
                 if (cloud_en1 & cloud_en2 & cloud_en3 == 1) begin
                     keep_cloud_distance = 50;
@@ -126,7 +126,6 @@ module GenPicBackground(
                         cloud_ypos3 = `CLOUD_BASE - ramdon_result;
                     end
                 end
-                
             end
             if (cloud_xpos1 == 0) begin
                 cloud_en1 = 0;

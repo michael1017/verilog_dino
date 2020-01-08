@@ -36,16 +36,21 @@ module GenPicDino(
     wire sit_valid;
     wire [8:0] sit_h_start, sit_v_start;
     wire [11:0] stand_RGB, sit_right_RGB, sit_left_RGB, sit_RGB; 
-    wire [11:0] stand_right_RGB, stand_left_RGB;
+    wire [11:0] run_RGB, dead_RGB;
     wire to_run, is_dead;
     //wire in_update_space;
 
 
     assign {vgaRed, vgaGreen, vgaBlue} = dino_behavior ? stand_RGB : sit_RGB;  
-    assign stand_RGB = stand_valid ? (to_run ? (clk_div22 ? dino_left_pixel : dino_right_pixel) : (is_dead ? dino_dead_pixel : dino_pixel)) : 12'hFFF;
+
+    assign stand_RGB = stand_valid ? (to_run ? run_RGB : dead_RGB) : 12'hFFF;
+    assign run_RGB = clk_div22 ? dino_left_pixel : dino_right_pixel;
+    assign dead_RGB = is_dead ? dino_dead_pixel : dino_pixel;
+
     assign sit_right_RGB = sit_valid ? sit_right_pixel : 12'hFFF;
     assign sit_left_RGB = sit_valid ? sit_left_pixel : 12'hFFF;
     assign sit_RGB = clk_div22 ? sit_left_RGB : sit_right_RGB;
+
     assign to_run = pos == `GROUND && game_state == `GAME_START;
     assign is_dead = game_state == `GAME_END;
 
